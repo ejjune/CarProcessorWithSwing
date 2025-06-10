@@ -11,11 +11,11 @@ public class CarRepository {
   private CarRepository() {}
 
   static {
-    cars = new ArrayList<>();
+    cars = List.of();
   }
 
   public static void addCars(List<Car> newCars) {
-    cars.addAll(newCars);
+    cars = List.copyOf(newCars);
   }
 
   public static List<Car> getAllCars() {

@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class CarFileLoader {
         }
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      Utils.displayText(e.getMessage());
     }
 
     return cars;
@@ -126,13 +127,18 @@ public class CarFileLoader {
         }
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      Utils.displayText(e.getMessage());
     }
     return cars;
   }
 
   public static List<Car> mergeCars(List<Car> csvCars, List<Car> xmlCars) {
     List<Car> mergedCars = new ArrayList<>();
+
+    if (csvCars.size() != xmlCars.size()) {
+      Utils.displayText("CSV and XML does not have the same size");
+      return Collections.emptyList();
+    }
 
     // Assuming csvCars and xmlCars have the same length
     for (int i = 0; i < csvCars.size(); i++) {
@@ -146,7 +152,7 @@ public class CarFileLoader {
               .type(csvCar.getType() != null ? csvCar.getType() : xmlCar.getType())
               .model(csvCar.getModel() != null ? csvCar.getModel() : xmlCar.getModel())
               .currency(csvCar.getCurrency() != null ? csvCar.getCurrency() : xmlCar.getCurrency())
-              .price(Double.isNaN(csvCar.getPrice()) ? xmlCar.getPrice() : csvCar.getPrice())
+              .price(csvCar.getPrice() > 0 ? csvCar.getPrice() : xmlCar.getPrice())
               .releaseDate(
                   csvCar.getReleaseDate() != null
                       ? csvCar.getReleaseDate()
@@ -164,8 +170,11 @@ public class CarFileLoader {
 
   private static Map<String, Double> mergeAdditionalPrices(
       Map<String, Double> csvPrices, Map<String, Double> xmlPrices) {
-    Map<String, Double> mergedPrices =
-        new HashMap<>(csvPrices == null ? new HashMap<>() : csvPrices);
+
+    csvPrices = csvPrices == null || csvPrices.isEmpty() ? new HashMap<>() : csvPrices;
+    xmlPrices = xmlPrices == null || xmlPrices.isEmpty() ? new HashMap<>() : xmlPrices;
+
+    Map<String, Double> mergedPrices = new HashMap<>(csvPrices);
 
     // Merge prices from both maps
     for (Map.Entry<String, Double> entry : xmlPrices.entrySet()) {
