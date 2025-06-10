@@ -247,7 +247,7 @@ class CarFileLoaderTest {
     List<Car> xmlCars = Arrays.asList(xmlCar1, xmlCar2);
 
     List<Car> merged = CarFileLoader.mergeCars(csvCars, xmlCars);
-    assertNull(merged);
+    assertEquals(0, merged.size());
   }
 
   /**
@@ -264,7 +264,7 @@ class CarFileLoaderTest {
     List<Car> xmlCars = Collections.singletonList(xmlCar1);
 
     List<Car> merged = CarFileLoader.mergeCars(csvCars, xmlCars);
-    assertNull(merged);
+    assertEquals(0, merged.size());
   }
 
   /** Tests {@link CarFileLoader#mergeCars(List, List)} with empty lists. */

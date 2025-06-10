@@ -15,6 +15,12 @@ import javax.swing.WindowConstants;
 import org.blank.factory.Factory;
 import org.blank.service.CarService;
 
+/**
+ * Main class for the Car File Processor application. Initializes the Swing GUI, sets up event
+ * listeners, and manages the visibility and layout of various application panels.
+ *
+ * <p>Author: Earl June Omictin
+ */
 public class Main {
 
   public static void main(String[] args) {
@@ -30,16 +36,17 @@ public class Main {
     JButton loadXml = new JButton("Load XML");
     JButton loadCsv = new JButton("Load CSV");
     JButton processFileButton = new JButton("Process File");
-    JButton processWithFiltersButton = new JButton("Process with Filters"); // Stays in filterPanel
     JButton filterButton = new JButton("Filter");
-    JButton sortButton = new JButton("Sort By"); // This button toggles visibility of sortPanel
+    JButton processWithFiltersButton = new JButton("Process with Filters");
+    JButton resetFilterButton = new JButton("Reset Filters");
+    JButton sortButton = new JButton("Sort By");
 
     JTextField xmlPathField = new JTextField(40);
     JTextField csvPathField = new JTextField(40);
 
     // Filter fields (Initially hidden)
     JPanel filterPanel = new JPanel();
-    filterPanel.setLayout(new GridLayout(8, 2)); // 7 label/textfield rows + 1 row for the button
+    filterPanel.setLayout(new GridLayout(9, 2)); // 8 label/textfield rows + 1 row for the button
     filterPanel.setVisible(false); // Hide filter panel initially
 
     JTextField brandFilter = new JTextField();
@@ -48,6 +55,7 @@ public class Main {
     JTextField priceFilter = new JTextField();
     JTextField currencyFilter = new JTextField();
     JTextField releaseDateFilter = new JTextField();
+    JTextField additionalPriceFilter = new JTextField(); // NEW: Additional Price filter field
 
     filterPanel.add(new JLabel("Brand:"));
     filterPanel.add(brandFilter);
@@ -61,9 +69,14 @@ public class Main {
     filterPanel.add(currencyFilter);
     filterPanel.add(new JLabel("Release Date (yyyy-MM-dd):"));
     filterPanel.add(releaseDateFilter);
+    // NEW: Add Additional Price filter label and field
+    filterPanel.add(new JLabel("Additional Price:"));
+    filterPanel.add(additionalPriceFilter);
 
     filterPanel.add(new JLabel("")); // Placeholder for left column of button row
     filterPanel.add(processWithFiltersButton); // Placed inside filterPanel
+    filterPanel.add(new JLabel(""));
+    filterPanel.add(resetFilterButton);
 
     // Sort fields (Initially hidden)
     JPanel sortPanel = new JPanel();
@@ -74,8 +87,9 @@ public class Main {
     sortGbc.insets = new Insets(2, 5, 2, 5); // Smaller padding for sort elements
     sortPanel.setVisible(false); // Hide sort panel initially
 
+    // NEW: Added "Additional Price" to sort fields
     String[] sortFields = {
-      "None", "Brand", "Type", "Model", "Price", "Main Currency", "Release Date"
+      "None", "Brand", "Type", "Model", "Price", "Main Currency", "Release Date", "Additional Price"
     };
     JComboBox<String> sortFieldComboBox = new JComboBox<>(sortFields);
 
@@ -196,8 +210,17 @@ public class Main {
     gbc.fill = GridBagConstraints.BOTH;
     gbc.weightx = 1.0;
     gbc.weighty = 1.0;
-    // Assuming Factory.getResultArea() correctly provides the JTextArea instance
     mainPanel.add(new JScrollPane(Factory.getResultArea()), gbc);
+
+    // NEW: Add author label below the result area
+    JLabel authorLabel = new JLabel("Author: Earl June Omictin");
+    gbc.gridx = 0;
+    gbc.gridy = 8; // Place in the next row after the result area
+    gbc.gridwidth = 3; // Span across the full width
+    gbc.fill = GridBagConstraints.NONE; // Do not fill space
+    gbc.anchor = GridBagConstraints.EAST; // Anchor to the right (or CENTER if preferred)
+    gbc.weighty = 0; // Do not take extra vertical space
+    mainPanel.add(authorLabel, gbc);
 
     frame.add(mainPanel);
     frame.setVisible(true);
@@ -217,7 +240,7 @@ public class Main {
                 modelFilter.getText(),
                 priceFilter.getText(),
                 currencyFilter.getText(),
-                releaseDateFilter.getText())); // Added additionalPriceFilter.getText()
+                releaseDateFilter.getText())); // FIX: Pass additionalPriceFilter.getText()
 
     filterButton.addActionListener(
         e -> {
@@ -238,5 +261,7 @@ public class Main {
           CarService.sortAndDisplay(
               selectedField, selectedOrder); // Call without resultArea if CarService manages it
         });
+
+    resetFilterButton.addActionListener(e -> CarService.resetFilters());
   }
 }

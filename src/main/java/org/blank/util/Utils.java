@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.blank.factory.Factory;
+import org.blank.repository.CarRepository;
 import org.blank.repository.model.Car;
 
 public class Utils {
@@ -54,9 +55,9 @@ public class Utils {
     }
   }
 
-  public static void displayCars(List<Car> cars) {
+  public static void displayCars() {
     StringBuilder sb = new StringBuilder();
-    for (Car car : cars) {
+    for (Car car : CarRepository.getFilteredCars()) {
       sb.append(car).append("\n");
     }
     Factory.getResultArea().setText(sb.toString());

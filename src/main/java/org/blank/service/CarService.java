@@ -52,7 +52,7 @@ public class CarService {
   public static void process() {
     try {
       CarFileLoader.process(csvFile, xmlFile);
-      Utils.displayCars(CarRepository.getAllCars());
+      Utils.displayCars();
     } catch (IOException e) {
       Utils.displayText(e.getMessage());
     }
@@ -65,7 +65,8 @@ public class CarService {
     }
 
     if ("None".equals(sortField)) {
-      Utils.displayCars(CarRepository.getAllCars());
+      CarRepository.sortOrFilterCars(CarRepository.getAllCars());
+      Utils.displayCars();
       return;
     }
 
@@ -77,11 +78,13 @@ public class CarService {
 
     // Sort the loadedCars list in place
     ArrayList<Car> sortedList =
-        CarRepository.getAllCars().stream()
+        CarRepository.getFilteredCars().stream()
             .sorted(comparator)
             .collect(Collectors.toCollection(ArrayList::new));
 
-    Utils.displayCars(sortedList); // Update the UI with sorted results
+    CarRepository.sortOrFilterCars(sortedList);
+
+    Utils.displayCars(); // Update the UI with sorted results
   }
 
   public static void processWithFilters(
@@ -96,10 +99,8 @@ public class CarService {
 
     LocalDate releaseDateFilter = Utils.parseDateStringSafely(releaseDateString);
 
-    List<Car> carsToFilter = CarRepository.getAllCars();
-
     List<Car> filteredCars =
-        carsToFilter.stream()
+        CarRepository.getFilteredCars().stream()
             .filter(
                 e ->
                     StringUtils.isBlank(brand)
@@ -132,7 +133,13 @@ public class CarService {
                             && e.getReleaseDate().isEqual(releaseDateFilter)))
             .collect(Collectors.toCollection(ArrayList::new));
 
-    Utils.displayCars(filteredCars);
+    CarRepository.sortOrFilterCars(filteredCars);
+    Utils.displayCars();
+  }
+
+  public static void resetFilters() {
+    CarRepository.sortOrFilterCars(CarRepository.getAllCars());
+    Utils.displayCars();
   }
 
   private static File chooseFile(String fileType) {
